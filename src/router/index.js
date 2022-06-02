@@ -22,9 +22,9 @@ const router = createRouter({
 	routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
 	if (to.matched.some(record => record.meta.protected)) {
-		const isAuthenticated = nhost.auth.isAuthenticated()
+		const isAuthenticated = await nhost.auth.isAuthenticatedAsync()
 		
 		if (isAuthenticated) {
 			next()
@@ -33,6 +33,12 @@ router.beforeEach((to, from, next) => {
 		}
 	} else {
 		next()
+	}
+})
+
+nhost.auth.onAuthStateChanged((event, session) => {
+	if (event === 'SIGNED_OUT') {
+		router.push('/login')
 	}
 })
 
